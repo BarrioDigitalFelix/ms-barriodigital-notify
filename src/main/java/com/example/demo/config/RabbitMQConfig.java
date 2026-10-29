@@ -1,11 +1,19 @@
 package com.example.demo.config;
+
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
+
+    @Bean
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
+    }
 
     @Value("${rabbitmq.queues.email}")
     private String emailQueueName;
@@ -45,6 +53,8 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(emailQueueName)
                 .withArgument("x-dead-letter-exchange", dlxExchangeName)
                 .withArgument("x-dead-letter-routing-key", "email.dead")
+                .withArgument("x-max-length", 1000)
+                .withArgument("x-message-ttl", 86400000)
                 .build();
     }
 
@@ -73,6 +83,8 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(crewQueueName)
                 .withArgument("x-dead-letter-exchange", dlxExchangeName)
                 .withArgument("x-dead-letter-routing-key", "crew.dead")
+                .withArgument("x-max-length", 1000)
+                .withArgument("x-message-ttl", 86400000)
                 .build();
     }
 
@@ -101,6 +113,8 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(certificateQueueName)
                 .withArgument("x-dead-letter-exchange", dlxExchangeName)
                 .withArgument("x-dead-letter-routing-key", "certificate.dead")
+                .withArgument("x-max-length", 1000)
+                .withArgument("x-message-ttl", 86400000)
                 .build();
     }
 
